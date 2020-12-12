@@ -1,0 +1,15 @@
+extends layout
+
+block content
+   main.container(style="text-align:center;" role='main')
+    .starter-template
+
+    h1 Twitter App
+    
+
+    form.form-control.form-control-lg(id="filter", method='POST', action='/filter' )
+      input.mr-sm-4(style="height:40px" name='input' type='text', placeholder='Filter')
+      button.btn.btn-outline-success.my-2.my-sm-3(type='submit') Search
+    hr
+
+    h2 #{result}

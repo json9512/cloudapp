@@ -1,0 +1,120 @@
+extends layout
+
+
+
+block content
+
+   main.container(style="text-align:center;" role='main')
+
+    .starter-template
+
+
+
+    h1 Twitter App
+
+    
+
+
+
+    form.form-control.form-control-lg(id="filter", method='POST', action='/filter' )
+
+      input.mr-sm-4(style="height:40px" name='input' type='text', placeholder='Filter')
+
+      button.btn.btn-outline-success.my-2.my-sm-3(type='submit') Search
+
+    hr
+
+    
+
+    h2 #{error}
+
+    h3 #{result.sentiment.message}
+
+    h5 [Positive > 0.05, Negative < -0.05, Netural in between]
+
+    ul(style="list-style-type: none;")
+
+      each element in result.sentiment.tweets
+
+        li(style="font-size: 18px")=element
+
+    
+
+
+
+    h2(style="margin-top: 3vh") Most Frequent Words in Tweets (Bigger = Higher Occurrence)
+
+    div(id="wordcloud")
+
+    
+
+
+    script(src="https://d3js.org/d3.v4.js")
+    script(src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3.layout.cloud.js")
+    script(type='text/javascript').
+
+      let dataArr = []
+
+      JSON.parse('!{result.wordcloud}').forEach(item => {
+
+        dataArr.push(item)
+
+      })
+
+      // set the dimensions and margins of the graph
+
+      var margin = {top: 10, right: 10, bottom: 10, left: 10},
+          width = 650 - margin.left - margin.right,
+          height = 650 - margin.top - margin.bottom;
+
+      // append the svg object to the body of the page
+
+      var svg = d3.select("#wordcloud").append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+
+        
+
+      var layout = d3.layout.cloud()
+        .size([width, height])
+        .words(dataArr.map((d) => {
+          return {text: d.word , size: d.size}}))
+        .padding(5)        //space between words
+        .rotate(function() { return ~~(Math.random() * 2) * 20; })
+        .font('Impact')
+        .fontSize(function(d) { return d.size; })      // font size of words
+        .on("end", draw);
+      layout.start();
+
+
+
+      function draw(words) {
+        svg.append("g")
+            .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+            .selectAll("text")
+              .data(words)
+            .enter().append("text")
+              .style("font-size", function(d) { return d.size; })
+              .style("fill", "#69b3a2")
+              .attr("text-anchor", "middle")
+              .style("font-family", "Impact")
+              .attr("transform", function(d) {
+                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+              })
+              .text(function(d) { 
+                return d.text; });
+
+      }
+
+        
+
+
+
+
+
+
+
+    
